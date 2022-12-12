@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+#
+# Author:
+#   Mirko van der Waal
+# Description:
+#   Day 1, AOC22.
+
+P1 () {
+  > P1
+  # Manually append a \n to properly end the final numeric set.
+  run P1 < <(cat input; echo)
+  # Find highest number.
+  sort -r P1 | head -1
+}
+
+P2 () {
+  > P2
+  # Manually append a \n to properly end the final numeric set.
+  run P2 < <(cat input; echo)
+  # Combine the 3 highest values.
+  sort -nr P2 | head -3 | paste -sd+ | bc
+}
+
+run () {
+  INDEX=0
+  while read -r NUMBER; do
+    case ${#NUMBER} in
+      0) echo $INDEX >> $1
+         INDEX=0
+      ;;
+      *) INDEX=$((INDEX + NUMBER))
+      ;;
+    esac
+  done
+}
+
+case $1 in
+  P1) P1 ;;
+  P2) P2 ;;
+esac

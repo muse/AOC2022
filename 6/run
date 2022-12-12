@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+#
+# Author:
+#   Mirko van der Waal
+# Description:
+#   Day 6, AOC22.
+
+declare -a MEMORY=()
+
+run () {
+  # Load the stream data as a string.
+  DATA=$(cat input)
+  # Manually determine the byte-length of the file. You cannot dynamically
+  # evaluate {N..M} in bash, hence the need to manually determine the length of
+  # the file.
+  for BYTE in {0..4096}; do
+    # Calculate the first marker by creating length $SIZE string from each byte
+    # forward, e.g: 1..14, 2..15, 3..16, 4..17, 5..18.
+    # - When finding _any_ duplicates in a string, the string is *not*
+    #   considered to be a marker.
+    # - When finding _non_ duplicates in a string, the string is considered to
+    #   be a marker.
+    if ! printf "${DATA:$BYTE:$SIZE}" \
+           | od -An -vtc -w1 \
+           | sort \
+           | uniq -dc \
+           | grep -q .; then
+      # We've detected the first marker, therefor:
+      # - Add $SIZE to the current byte count to account for the marker offset.
+      # - Return explicitly to prematurely quit the function.
+      echo $((BYTE + $SIZE))
+      return 0
+    fi
+  done
+}
+
+P1 () {
+  # Determine the marker size.
+  SIZE=4
+  run
+}
+
+P2 () {
+  # Determine the marker size.
+  SIZE=14
+  run
+}
+
+case $1 in
+  P1) P1 ;;
+  P2) P2 ;;
+esac

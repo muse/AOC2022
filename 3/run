@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+#
+# Author:
+#   Mirko van der Waal
+# Description:
+#   Day 3, AOC22.
+
+# Build the (a1, z26) and (A27, Z52) list.
+declare -A VALUES
+
+VALUE=1
+for N in {a..z}; do
+  VALUES[$N]=$VALUE
+  VALUE=$((VALUE + 1))
+done
+for N in {A..Z}; do
+  VALUES[$N]=$VALUE
+  VALUE=$((VALUE + 1))
+done
+
+P1 () {
+  > P1.a
+  > P1.b
+  > P1.sum
+
+  while read -r LINE; do
+    SPLIT=$((${#LINE} / 2))
+    grep -o . <<< ${LINE:0:$SPLIT} | sort > P1.a
+    grep -o . <<< ${LINE:$SPLIT}   | sort > P1.b
+    join P1.a P1.b | head -1 | while read -r CHARACTER; do
+      echo ${VALUES[$CHARACTER]} >> P1.sum
+    done
+  done < input
+  paste -sd+ < P1.sum | bc
+}
+
+P2 () {
+  > P2.a
+  > P2.b
+  > P2.c
+  > P2.sum
+
+  # Split the data in chunks of 3.
+  (rm -rf P2.d; mkdir P2.d; cd P2.d; split -l3) < input
+
+  for GROUP in P2.d/*; do
+    < $GROUP head -1           | grep -o . | sort > P2.a
+    < $GROUP head -2 | tail +2 | grep -o . | sort > P2.b
+    < $GROUP head -3 | tail +3 | grep -o . | sort > P2.c
+    join P2.a P2.b | join - P2.c | head -1 | while read -r CHARACTER; do
+      echo ${VALUES[$CHARACTER]} >> P2.sum
+    done
+  done
+
+  paste -sd+ < P2.sum | bc
+}
+
+case $1 in
+  P1) P1 ;;
+  P2) P2 ;;
+esac

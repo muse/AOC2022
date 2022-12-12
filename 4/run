@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+#
+# Author:
+#   Mirko van der Waal
+# Description:
+#   Day 4, AOC22.
+
+P1 () {
+  > P1.seq.lhs
+  > P1.seq.rhs
+  N=0
+  while :; read -r LINE; do
+    # Parse the line as such:
+    #   $1-$2,$3-$4
+    set $(sed 's/-/ /g;s/,/ /;' <<< $LINE)
+    seq $1 $2 > P1.seq.lhs
+    seq $3 $4 > P1.seq.rhs
+    if (grep -q "^$1$" P1.seq.rhs  && \
+        grep -q "^$2$" P1.seq.rhs) || \
+       (grep -q "^$3$" P1.seq.lhs  && \
+        grep -q "^$4$" P1.seq.lhs); then
+      N=$((N + 1))
+    fi
+  done < input
+  echo $N
+}
+
+P2 () {
+  > P2.seq.lhs
+  > P2.seq.rhs
+  N=0
+  while :; read -r LINE; do
+    # Parse the line as such:
+    #   $1-$2,$3-$4
+    set $(sed 's/-/ /g;s/,/ /;' <<< $LINE)
+    seq $1 $2 > P2.seq.lhs
+    seq $3 $4 > P2.seq.rhs
+    if (grep -q "^$1$" P2.seq.rhs  || \
+        grep -q "^$2$" P2.seq.rhs) || \
+       (grep -q "^$3$" P2.seq.lhs  || \
+        grep -q "^$4$" P2.seq.lhs); then
+      N=$((N + 1))
+    fi
+  done < input
+  echo $N
+
+}
+
+case $1 in
+  P1) P1 ;;
+  P2) P2 ;;
+esac

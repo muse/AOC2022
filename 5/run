@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+#
+# Author:
+#   Mirko van der Waal
+# Description:
+#   Day 5, AOC22.
+
+# Memory values are stored in reverse, meaning MEMORY[1]=ABC has:
+# - A at the top
+# - B in the middle
+# - C at the bottom.
+declare -A MEMORY=
+
+while read -r LINE; do
+  MEMORY[${LINE%:*}]=${LINE#*:}
+done < input-stack
+
+# Remove $2 amount of crates from $1.
+Memory.pop () {
+  # Values that have been removed.
+  echo "${MEMORY[$1]:0:$2}"
+  # Update the memory.
+  MEMORY[$1]=${MEMORY[$1]:$2}
+}
+
+# Updates $1 with $0.
+Memory.add () {
+  MEMORY[$1]=$(cat)${MEMORY[$1]}
+}
+
+P1 () {
+  > P1.pop
+  while read -r LINE; do
+    # $1    $2  $3      $4  $5  $6
+    # Move  $N  from    $N  to  $N
+    set $LINE
+    for N in $(seq $2); do
+      Memory.pop $4 1 > P1.pop
+      Memory.add $6   < P1.pop
+    done
+  done < input
+}
+
+P2 () {
+  > P2.pop
+  while read -r LINE; do
+    # $1    $2  $3      $4  $5  $6
+    # Move  $N  from    $N  to  $N
+    set $LINE
+    Memory.pop $4 $2 > P2.pop
+    Memory.add $6    < P2.pop
+  done < input
+}
+
+case $1 in
+  P1) P1 ;;
+  P2) P2 ;;
+esac
+
+# Read the first byte of each register.
+for REGISTER in {1..9}; do
+  printf "${MEMORY[$REGISTER]:0:1}"
+done
+echo

@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+#
+# Author:
+#   Mirko van der Waal
+# Description:
+#   Day 2, AOC22.
+
+# A, X = Rock
+# B, Y = Paper
+# C, Z = Scissor
+declare -A MOVES
+MOVES[A]=1
+MOVES[B]=2
+MOVES[C]=3
+MOVES[X]=1
+MOVES[Y]=2
+MOVES[Z]=3
+
+declare -A BEATS
+BEATS[1]=3
+BEATS[2]=1
+BEATS[3]=2
+
+declare -A LOSES
+LOSES[1]=2
+LOSES[2]=3
+LOSES[3]=1
+
+parse-literal () {
+  # Split a line by force parsing $@ with the default IFS.
+  set $@
+  # Loss
+  # Draw
+  # Win
+  if    ((${BEATS[${MOVES[$1]}]} == ${MOVES[$2]})); then
+      POINTS=$((POINTS + 0 + ${MOVES[$2]}))
+  elif  ((${MOVES[$1]}           == ${MOVES[$2]})); then
+      POINTS=$((POINTS + 3 + ${MOVES[$2]}))
+  else
+      POINTS=$((POINTS + 6 + ${MOVES[$2]}))
+  fi
+}
+
+parse-reactive () {
+  # Split a line by force parsing $@ with the default IFS.
+  set $@
+  # Loss
+  # Draw
+  # Win
+  case $2 in
+    X) POINTS=$((POINTS + 0 + ${BEATS[${MOVES[$1]}]})) ;;
+    Y) POINTS=$((POINTS + 3 + ${MOVES[$1]})) ;;
+    Z) POINTS=$((POINTS + 6 + ${LOSES[${MOVES[$1]}]})) ;;
+  esac
+}
+
+P1 () {
+  POINTS=0
+  while read -r LINE; do
+    parse-literal $LINE
+  done < input
+  echo $POINTS
+}
+
+P2 () {
+  POINTS=0
+  while read -r LINE; do
+    parse-reactive $LINE
+  done < input
+  echo $POINTS
+}
+
+case $1 in
+  P1) P1 ;;
+  P2) P2 ;;
+esac
